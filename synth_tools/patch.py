@@ -18,7 +18,8 @@ from micropython import const
 
 class LFOParams:
     """
-    Parameters to configure a synthio.LFO object
+    Parameters to configure a synthio.LFO object.
+    Note: this is currently unused
     """
 
     def __init__(self, rate=None, scale=None, offset=None, once=False, waveform=None):
@@ -41,7 +42,7 @@ class LFOParams:
 
 class EnvParams:
     """
-    Parameters to configure a synthio.Envelope object
+    Parameters to configure a synthio.Envelope object.
     """
 
     def __init__(self, attack_time=0.1, decay_time=0.01, release_time=0.2,

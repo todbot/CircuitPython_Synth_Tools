@@ -243,7 +243,8 @@ class Wavetable:
         wave_pos_frac = wave_pos - int(wave_pos)
         # mix waveforms A & B and copy result into waveform used by synthio
         # and reduce volume of wavetable by 2 so multi-voice doesn't distort as much
-        self.waveform[:] = lerp(self.waveformA, self.waveformB, wave_pos_frac) // 2
+        # (remove div-by-two for now)
+        self.waveform[:] = lerp(self.waveformA, self.waveformB, wave_pos_frac)  # // 2
 
     def deinit(self):
         """Close the WAV file used by this wavetable"""

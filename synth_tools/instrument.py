@@ -97,7 +97,9 @@ class PolyWaveSynth(Instrument):
 
         # standard two-osc oscillator patch
         if patch.wave_type == WaveType.OSC:
-            # self.waveform is our working buffer, overwritten w/ wavemix
+            # 'waveform' is our working buffer, overwritten w/ wavemix
+            # 'waveformA' is main wave, copied into 'waveform'
+            # 'waveformB' is second wave, copied into 'waveform'
             self.waveform = Waves.make_waveform("silence")
             self.waveformA = Waves.make_waveform(patch.wave)
             self.waveformB = None
