@@ -1,5 +1,9 @@
 import time
-from supervisor import ticks_ms
+try:
+    from supervisor import ticks_ms
+except:
+    def ticks_ms():
+        return time.monotonic_ns() // 1_000_000
 
 class StepSequencer():
     def __init__(self, step_count, bpm, on_func=None, off_func=None, playing=False):
