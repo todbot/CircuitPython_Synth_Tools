@@ -23,10 +23,10 @@ drum_pattern1 = (
 
 drum_map = (36, 48, 72, 0, 0, 0, 0, 0)  # could be midi notes
 drum_map = (  # or anything else your callback wants
-    audiocore.WaveFile("/kit0_909/00_909kick4.wav"),
-    audiocore.WaveFile("/kit0_909/01_909snare2.wav"),
-    audiocore.WaveFile("/kit0_909/02_909hatclosed2a.wav"),
-    audiocore.WaveFile("/kit0_909/03_909hatopen5.wav"),
+    audiocore.WaveFile("/wavs/kit0_909/00_909kick4.wav"),
+    audiocore.WaveFile("/wavs/kit0_909/01_909snare2.wav"),
+    audiocore.WaveFile("/wavs/kit0_909/02_909hatclosed2a.wav"),
+    audiocore.WaveFile("/wavs/kit0_909/03_909hatopen5.wav"),
 )
 
 
