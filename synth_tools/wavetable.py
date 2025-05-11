@@ -1,9 +1,18 @@
-# simple wavetable class for synthio
-# part of todbot circuitpython synthio tutorial
-# 10 Feb 2025 - @todbot / Tod Kurt
-#
+## pylint: disable=invalid-name,too-many-arguments,multiple-statements
+# multiple-statements,too-many-instance-attributes
+# SPDX-FileCopyrightText: Copyright (c) 2023 Tod Kurt
+# SPDX-License-Identifier: MIT
+"""
+`waves`
+================================================================================
 
-"""Wavetable class for synthio"""
+`Wavetable` is a set of waveform construction tools for `synthio`.
+`Wavetable` uses `Waves` to create a Wavetable waveform for `Instrument`
+that can load arbitrary two waveforms and mix between them.
+
+Part of synth_tools.
+
+"""
 
 import ulab.numpy as np
 import adafruit_wave
