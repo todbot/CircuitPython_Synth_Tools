@@ -30,7 +30,7 @@ last_print_time = 0
 while True:
     arp.update()
     
-    root_note = 32 + int(32 * knobA.value/65535)
+    root_note = 24 + int(36 * knobA.value/65535)
 
     patt_i = int((len(patterns)-1) * knobB.value/65535)
     
@@ -43,6 +43,6 @@ while True:
             
     if time.monotonic() - last_print_time > 0.5:
         last_print_time = time.monotonic()
-        print("note:", root_note, "octaves:",octaves, "pattern:",pattern_names[patt_i])
+        print("note=%d oct=%d pattern='%s'" % (root_note,octaves,pattern_names[patt_i]))
 
 

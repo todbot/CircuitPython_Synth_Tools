@@ -6,7 +6,7 @@ except:
         return time.monotonic_ns() // 1_000_000
 
 class StepSequencer():
-    def __init__(self, step_count, bpm, on_func=None, off_func=None, playing=False):
+    def __init__(self, step_count, bpm, on_func=None, off_func=None):
         self.steps_per_beat = 4  # 1 = 1/4 note, 2 = 8th note, 4 = 16th note
         self.step_count = step_count  # how big the sequence is
         self.bpm = bpm  # sets self.step_millis
@@ -18,13 +18,14 @@ class StepSequencer():
         self.on_func = on_func    # callback to invoke when 'note on' should be sent
         self.off_func = off_func  # callback to invoke when 'note off' should be sent
         self.gate_off_millis = 0  # when in the future our note off should occur
-        self.held_note = (0,0,0,0)  # the current note being on, to be turned off
+        self.held_note = None     # the current note playing
         self.transpose = 0
-        self.playing = playing   # is sequence running or not (but use .play()/.pause())
+        self.playing = False      # is sequence running or not (but use .start()/.stop())
 
     @property
     def bpm(self):  
         return 60_000 / self.step_millis / self.steps_per_beat
+    
     @bpm.setter
     def bpm(self, bpm):
         """Sets the internal tempo. step_millis is time between steps"""
@@ -44,7 +45,8 @@ class StepSequencer():
 
     def stop(self):
         """Stop sequencer, turning off any currently-sounding note"""
-        self.off_func(*self.held_note)
+        if self.held_note:
+            self.off_func(*self.held_note)
         self.playing = False
         self.i = 0
 
@@ -55,20 +57,21 @@ class StepSequencer():
         
         now = ticks_ms()
         delta_millis = now - self.next_millis
-        
-        if self.gate_off_millis > 0 and now - self.gate_off_millis >= 0:
+
+        # trigger note-off after gate time
+        if now - self.gate_off_millis >= 0 and self.held_note:
             self.off_func(*self.held_note)
-            self.gate_off_millis = 0
+            self.held_note = None
 
         if delta_millis >= 0:  # time to play
-            print("                      delta_millis:", delta_millis, self.error_millis)
+            #print("                      delta_millis:", delta_millis, self.error_millis)
             self.error_millis += delta_millis
-            held_note = self.steps[self.i]  # get new note to play
-            held_note[0] += self.transpose  # adjust for transpose
-            self.held_note = held_note      # save it for when we note_off it
+            (note,vel,gate,on) = self.steps[self.i]  # get new note to play
+            note += self.transpose  # adjust for transpose
+            self.held_note = (note,vel,gate,on)      # save it for when we note_off it
             
             # trigger new note
-            self.on_func(*held_note)   # held_note = (note,vel,gate,on)
+            self.on_func(*self.held_note)   # held_note = (note,vel,gate,on)
 
             # prep for next step in sequence
             self.i = (self.i + 1) % self.step_count
