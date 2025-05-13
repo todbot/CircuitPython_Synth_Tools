@@ -1,11 +1,35 @@
+## pylint: disable=invalid-name,too-many-arguments,multiple-statements
+# SPDX-FileCopyrightText: Copyright (c) 2023 Tod Kurt
+# SPDX-License-Identifier: MIT
+"""
+`trig_sequencer`
+================================================================================
+
+`TrigSequencer` is a trigger-based (drum) sequencer for rhythmic events.
+
+Part of synth_tools.
+
+"""
+
 import time
 try:
     from supervisor import ticks_ms
-except:
+except ImportError:
     def ticks_ms():
+        """stand-in for supervisor.ticks_ms"""
         return time.monotonic_ns() // 1_000_000
 
+
 class TrigSequencer():
+    """
+    TrigSequencer contains a list of on/off event triggers in list of steps.
+
+    :param int trig_count: how many triggers to keep track of
+    :param int step_count: how many for all the triggers
+    :param int steps_per_beat: number of steps in a beat (1=quarter note, 2=8th note, 4=16th note)
+    :param function on_func: function to call on trigger start
+    :param function off_func: function to call on trigger end (unused)
+    """
     def __init__(self, trig_count, step_count, steps_per_beat, on_func=None, off_func=None):
         self.trig_count = trig_count
         self.step_count = step_count

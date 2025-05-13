@@ -40,8 +40,8 @@ def note_off(midi_note, vel, gate, on):
         synth.release(note)
         note = None
 
-seq = StepSequencer(16, bpm, note_on, note_off)
-seq.steps_per_beat = steps_per_beat  # 1 = quarter note, 2 = 8th note, 4 = 16th note
+seq = StepSequencer(16, steps_per_beat, note_on, note_off)
+seq.bpm = bpm
 
 # convert our pattern to a sequence for the sequencer
 for i in range(len(pattern_steps)):
