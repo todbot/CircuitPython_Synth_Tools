@@ -141,7 +141,13 @@ class Waves:
         r10 = int(release_time * 10)
         a = [i * 65535 // a10 - 32767 for i in range(a10)]
         r = [32767 - i * 65535 // r10 for i in range(r10)]
-        return Waves.from_list( a + [ 32767, ] + r )  # add a max middle
+        return Waves.from_list(
+            a
+            + [
+                32767,
+            ]
+            + r
+        )  #  # fmt: off;  add a max middle
 
     @staticmethod
     def wav(filepath, size=256, pos=0):

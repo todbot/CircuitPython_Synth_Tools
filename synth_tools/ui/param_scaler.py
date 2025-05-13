@@ -18,7 +18,6 @@ Part of synth_tools.
 
 """
 
-
 from micropython import const
 
 knob_min, knob_max = const(0), const(255)

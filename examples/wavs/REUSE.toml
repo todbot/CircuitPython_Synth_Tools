@@ -1,0 +1,8 @@
+version = 1
+
+# the main license for all wavs
+[[annotations]]
+path = ["**.wav", "**.WAV", "**.txt"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Unknown authors"
+SPDX-License-Identifier = "Unlicense"

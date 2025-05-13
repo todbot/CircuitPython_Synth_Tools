@@ -1,11 +1,13 @@
-#
+# SPDX-FileCopyrightText: Copyright (c) 2025 Tod Kurt
+# SPDX-License-Identifier: MIT
 
 # adding this can help with timing, if you need it
 # import microcontroller
 # microcontroller.cpu.frequency = 200_000_000
 
 import time
-import audiocore, audiomixer
+import audiocore
+import audiomixer
 from synth_setup import audio, SAMPLE_RATE, BUFFER_SIZE
 from trig_sequencer import TrigSequencer
 

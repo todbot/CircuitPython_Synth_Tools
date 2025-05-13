@@ -12,14 +12,17 @@ Part of synth_tools.
 """
 
 import time
+
 try:
     from supervisor import ticks_ms
 except ImportError:
+
     def ticks_ms():
         """stand-in for supervisor.ticks_ms"""
         return time.monotonic_ns() // 1_000_000
 
-class StepSequencer():
+
+class StepSequencer:
     """
     StepSequencer contains a list of meloci events in list of steps.
 
@@ -28,20 +31,23 @@ class StepSequencer():
     :param function on_func: function to call on note-on
     :param function off_func: function to call on note-off
     """
+
     def __init__(self, step_count, steps_per_beat, on_func=None, off_func=None):
-        self.steps_per_beat = steps_per_beat  # 1 = 1/4 note, 2 = 8th note, 4 = 16th note
+        self.steps_per_beat = (
+            steps_per_beat  # 1 = 1/4 note, 2 = 8th note, 4 = 16th note
+        )
         self.step_count = step_count  # how big the sequence is
         self.i = 0  # where in the step sequence we currently are
 
         # our sequence, list of step "objects": ie. list (notenum, vel, gate, on)
-        self.steps = [ [0, 127, 0.5, True] for i in range(step_count)]
+        self.steps = [[0, 127, 0.5, True] for i in range(step_count)]
 
-        self.on_func = on_func    # callback to invoke when 'note on' should be sent
+        self.on_func = on_func  # callback to invoke when 'note on' should be sent
         self.off_func = off_func  # callback to invoke when 'note off' should be sent
         self.gate_off_millis = 0  # when in the future our note off should occur
-        self.held_note = None     # the current note playing
+        self.held_note = None  # the current note playing
         self.transpose = 0
-        self.playing = False      # is sequence running or not (but use .start()/.stop())
+        self.playing = False  # is sequence running or not (but use .start()/.stop())
         self.next_millis = 0
         self.error_millis = 0
 
@@ -54,7 +60,7 @@ class StepSequencer():
     def bpm(self, bpm):
         """Sets the internal tempo. step_millis is time between steps"""
         self.step_millis = 60_000 / self.steps_per_beat / bpm
-        #print("stepseq.set_bpm: %6.2f %d" % (self.step_millis, bpm) )
+        # print("stepseq.set_bpm: %6.2f %d" % (self.step_millis, bpm) )
 
     def set_gates(self, gate):
         """Set all gates to a specified percentage 0-1"""
@@ -80,22 +86,22 @@ class StepSequencer():
             return
 
         now = ticks_ms()
-        delta_millis = now - self.next_millis 
+        delta_millis = now - self.next_millis
 
         # trigger note-off after gate time
         if now - self.gate_off_millis >= 0 and self.held_note:
             self.off_func(*self.held_note)
             self.held_note = None
 
-        if delta_millis >= 0:   # if zero or great, time for next step
-            #print("                      delta_millis:", delta_millis, self.error_millis)
+        if delta_millis >= 0:  # if zero or great, time for next step
+            # print("                      delta_millis:", delta_millis, self.error_millis)
             self.error_millis += delta_millis
-            (note,vel,gate,on) = self.steps[self.i]  # get new note to play
+            (note, vel, gate, on) = self.steps[self.i]  # get new note to play
             note += self.transpose  # adjust for transpose
-            self.held_note = (note,vel,gate,on)      # save it for when we note_off it
+            self.held_note = (note, vel, gate, on)  # save it for when we note_off it
 
             # trigger new note
-            self.on_func(*self.held_note)   # held_note = (note,vel,gate,on)
+            self.on_func(*self.held_note)  # held_note = (note,vel,gate,on)
 
             # prep for next step in sequence
             self.i = (self.i + 1) % self.step_count
@@ -104,6 +110,6 @@ class StepSequencer():
             self.next_millis = now + self.step_millis
             if self.error_millis > 1:
                 self.next_millis -= self.error_millis
-                self.error_millis =0
+                self.error_millis = 0
             # next note off is some percentage smaller
             self.gate_off_millis = now + self.step_millis * self.held_note[2]

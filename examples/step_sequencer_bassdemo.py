@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 #
 import time
+import random
 import synthio
 import ulab.numpy as np
 from synth_setup import synth, knobA, knobB, keys
@@ -11,10 +12,10 @@ bpm = 120
 gate_length = 0.3  #  percent 0-1
 steps_per_beat = 4  # 1 = 1/4 note, 2 = 1/8th note, 4 = 1/16th note, 8 = 1/32nd note
 # sequence to play
-pattern_steps = (0, 0, 0, 0, -2, -2, -4, -4, 3, 3, 5, 5, 7, 7, 12, 12)
+# pattern_steps = (0, 0, 0, 0,  -2, -2, -4, -4,  3, 3, 5, 5,  7, 7, 12, 12)
 pattern_steps = (0, 0, 0, 0, 2, 2, -4, -4, 0, 0, 5, 5, 7, 7, 12, 12)
 root_note = 36
-button_mode = 0  # 0 = normal, 1=octave up, 2=no filtenv, 3=no filtenv + oct up
+button_mode = 0  # 0=normal, 1=octave up, 2=no filtenv, 3=no filtenv + oct up
 
 wave_ramp_down = np.array((32767, 0), dtype=np.int16)
 wave_exp_down = np.array(32767 * np.linspace(1, 0, num=128) ** 2, dtype=np.int16)
@@ -27,12 +28,13 @@ def note_on(midi_note, vel, gate, on):
     # print("note_on", midi_note, vel, gate)
     if note:
         note_off(midi_note, 0, 0, 1)
-    release_time = 1.5 * seq.step_millis * gate / 1000
+    # release_time = 1.5 * (seq.step_millis * gate / 1000)
+    release_time = 1.5 * (seq.step_millis * gate / 1000) * random.randint(1, 2)
     amp_env = synthio.Envelope(attack_time=0.0, release_time=release_time)
     filt_env = synthio.LFO(
-        rate=1 / release_time,
+        rate=2 / release_time,
         once=True,
-        scale=5000,
+        scale=4000,
         offset=0,
         # waveform=wave_exp_down)
         waveform=wave_ramp_down,
@@ -51,8 +53,8 @@ def note_off(midi_note, vel, gate, on):
         note = None
 
 
-seq = StepSequencer(16, steps_per_beat, note_on, note_off)
-seq.bpm = bpm
+seq = StepSequencer(16, bpm, note_on, note_off)
+seq.steps_per_beat = steps_per_beat  # 1 = quarter note, 2 = 8th note, 4 = 16th note
 
 # convert our pattern to a sequence for the sequencer
 for i in range(len(pattern_steps)):

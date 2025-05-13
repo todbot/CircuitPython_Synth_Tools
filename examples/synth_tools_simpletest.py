@@ -1,46 +1,28 @@
-# SPDX-FileCopyrightText: Copyright (c) 2024 Tod Kurt
-#
-# SPDX-License-Identifier: Unlicense
+# SPDX-FileCopyrightText: Copyright (c) 2025 Tod Kurt
+# SPDX-License-Identifier: MIT
 
-import time, random
-import board
+import time
+import ulab.numpy as np
 import synthio
+from synth_setup import synth, knobA
+from wavetable import Wavetable
 
-from synth_tools.patch import Patch
-from synth_tools.instrument import Instrument
+wavetable_fname = "/wavs/PLAITS02.WAV"  # from http://waveeditonline.com/
 
-# set up synth out on PWM audio with an RC filter
-import audiopwmio
+wavetable1 = Wavetable(wavetable_fname)
 
-audio = audiopwmio.PWMAudioOut(board.GP10)
-synth = synthio.Synthesizer(sample_rate=22050)
-audio.play(synth)
+midi_note = 48
+note = synthio.Note(synthio.midi_to_hz(midi_note), waveform=wavetable1.waveform)
+synth.press(note)
 
-# create a synth patch
-patch1 = Patch("one")
-patch1.waveA = "SAW"
-patch1.waveB = "NZE"
-patch1.wave_mix = 0.5  # mix equal between both saw & noise
-patch1.amp_env.attack_time = 0.01
-patch1.amp_env.release_time = 0.5
-patch1.filt_env.attack_time = 1.1
-patch1.filt_env.release_time = 0.8
-patch1.filt_env_amount = 0.5
-patch1.filt_f = 345
-patch1.filt_q = 1.7
-
-instrument = PolyWaveSynth(synth, patch1)
-
-last_note_time = 0
-note_num = 0
+# create a positive ramp-up-down LFO to scan through the waveetable
+wave_lfo = synthio.LFO(rate=0.05, waveform=np.array((0, 32767), dtype=np.int16))
+wave_lfo.scale = wavetable1.num_waves
+synth.blocks.append(wave_lfo)  # this activates LFO when not attached to Note
 
 while True:
-    instrument.update()
-    if time.monotonic() - last_note_time >= 0.3:
-        last_note_time = time.monotonic()
-        if not note_num:
-            note_num = random.choice(36, 41, 43, 48)
-            instrument.note_on(notenum)
-        else:
-            instrument.note_off(note_num)
-            note_num = 0
+    # regularly copy LFO to wave_pos by hand
+    wavetable1.wave_pos = wave_lfo.value
+    wave_lfo.rate = (knobA.value / 65535) * 0.25
+    print("wave_pos:%.2f" % wavetable1.wave_pos)
+    time.sleep(0.01)
